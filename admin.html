@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Visitor Analytics — Al Haider Foundation</title>
+<style>
+  :root{
+    --green:#0c3b1c; --green2:#186635; --gold:#d4a017;
+    --bg:#f3f6f2; --card:#fff; --line:#e2e8e0; --muted:#5a6b60; --text:#16241b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text)}
+  header{background:var(--green);color:#fff;padding:16px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+  header h1{font-size:1.15rem;margin:0;font-weight:700}
+  header .sub{font-size:.8rem;opacity:.8}
+  button{cursor:pointer;font-family:inherit}
+  .btn{background:var(--gold);color:#1a1a1a;border:none;border-radius:8px;padding:9px 16px;font-weight:600;font-size:.85rem}
+  .btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.4)}
+  main{max-width:1100px;margin:0 auto;padding:22px}
+
+  /* Login */
+  .login{max-width:360px;margin:8vh auto;background:var(--card);padding:30px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+  .login h2{margin:0 0 6px;color:var(--green)}
+  .login p{margin:0 0 18px;color:var(--muted);font-size:.85rem}
+  .login label{display:block;font-size:.8rem;font-weight:600;margin:12px 0 5px}
+  .login input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;font-size:.9rem}
+  .login .btn{width:100%;margin-top:18px;padding:12px}
+  .err{color:#c0392b;font-size:.82rem;margin-top:12px;min-height:18px}
+
+  /* Stats */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:22px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .stat .n{font-size:1.9rem;font-weight:800;color:var(--green)}
+  .stat .l{font-size:.78rem;color:var(--muted);margin-top:2px}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr}}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .panel h3{margin:0 0 12px;font-size:.95rem;color:var(--green)}
+  .bar{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:.82rem}
+  .bar .lab{width:120px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bar .track{flex:1;background:#eef2ee;border-radius:6px;height:16px;overflow:hidden}
+  .bar .fill{height:100%;background:linear-gradient(90deg,var(--green2),var(--gold))}
+  .bar .val{width:38px;text-align:right;color:var(--muted)}
+
+  table{width:100%;border-collapse:collapse;font-size:.82rem}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+  th{color:var(--muted);font-weight:600;position:sticky;top:0;background:var(--card)}
+  .tablewrap{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:auto;max-height:520px}
+  .tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.72rem;font-weight:600}
+  .tag.new{background:#e8f5ee;color:#186635}
+  .tag.ret{background:#fdf0da;color:#a07808}
+  a.map{color:var(--green2);text-decoration:none;font-weight:600}
+  .hidden{display:none!important}
+  .loading{text-align:center;padding:40px;color:var(--muted)}
+  .filterbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:18px;font-size:.85rem}
+  .filterbar select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;font-size:.85rem;background:#fff;margin-left:5px}
+  .filterbar label{display:inline-flex;align-items:center}
+  .filterbar label.chk{gap:6px}
+  .filterbar .hint{color:var(--muted);font-size:.78rem}
+  .tag.vpn{background:#fdeaea;color:#c0392b}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  td.num.hi{font-weight:700;color:var(--green)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN VIEW -->
+<div id="login-view">
+  <div class="login">
+    <h2>Analytics Login</h2>
+    <p>Al Haider Foundation — visitor dashboard</p>
+    <label>Email</label>
+    <input type="email" id="email" autocomplete="username" placeholder="you@email.com">
+    <label>Password</label>
+    <input type="password" id="password" autocomplete="current-password" placeholder="••••••••">
+    <button class="btn" id="login-btn">Sign In</button>
+    <div class="err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- DASHBOARD VIEW -->
+<div id="dash-view" class="hidden">
+  <header>
+    <div>
+      <h1>Visitor Analytics</h1>
+      <div class="sub" id="who"></div>
+    </div>
+    <div>
+      <button class="btn ghost" id="refresh-btn">Refresh</button>
+      <button class="btn ghost" id="logout-btn">Log out</button>
+    </div>
+  </header>
+  <main>
+    <div id="loading" class="loading">Loading data…</div>
+    <div id="content" class="hidden">
+      <div class="filterbar">
+        <label>Platform:
+          <select id="platform-filter">
+            <option value="all">All platforms</option>
+            <option value="Android">Android only</option>
+            <option value="iOS">iOS (iPhone/iPad) only</option>
+            <option value="Desktop">Desktop / Web only</option>
+          </select>
+        </label>
+        <label>VPN/Proxy:
+          <select id="vpn-filter">
+            <option value="all">All traffic</option>
+            <option value="exclude">Exclude VPN</option>
+            <option value="only">Only VPN/Proxy</option>
+          </select>
+        </label>
+        <label class="chk"><input type="checkbox" id="hide-internal" checked> Hide my own visits</label>
+        <span class="hint">Everything below updates instantly.</span>
+      </div>
+
+      <div class="cards" id="cards"></div>
+
+      <div class="grid2">
+        <div class="panel"><h3>Operating System</h3><div id="os"></div></div>
+        <div class="panel"><h3>Browser</h3><div id="browsers"></div></div>
+      </div>
+
+      <div class="grid2">
+        <div class="panel"><h3>Top Countries</h3><div id="countries"></div></div>
+        <div class="panel"><h3>Top Cities</h3><div id="cities"></div></div>
+      </div>
+
+      <div class="grid2">
+        <div class="panel"><h3>Devices (mobile vs desktop)</h3><div id="devices"></div></div>
+        <div class="panel"><h3>Business Events</h3><div id="events"></div></div>
+      </div>
+
+      <!-- SMART CROSS TABLE: location × platform -->
+      <div class="panel" style="margin-bottom:22px">
+        <h3>Location × Platform — where do Android vs Web users come from?</h3>
+        <div class="tablewrap">
+          <table>
+            <thead><tr>
+              <th>Location</th><th>Android</th><th>iOS</th><th>Desktop/Web</th><th>Total</th>
+            </tr></thead>
+            <tbody id="crosstab"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-bottom:22px">
+        <h3>Recent Visits</h3>
+        <div class="tablewrap">
+          <table>
+            <thead><tr>
+              <th>When</th><th>Type</th><th>City</th><th>Country</th>
+              <th>OS</th><th>Browser</th><th>VPN</th><th>Source</th><th>Time</th>
+            </tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+import { firebaseConfig } from './firebase-config.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getFirestore, collection, getDocs, query, orderBy, limit }
+  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const $ = id => document.getElementById(id);
+
+/* ── Auth ── */
+$('login-btn').addEventListener('click', async () => {
+  $('login-err').textContent = '';
+  try {
+    await signInWithEmailAndPassword(auth, $('email').value.trim(), $('password').value);
+  } catch (e) {
+    $('login-err').textContent = 'Login failed: ' + (e.code || e.message);
+  }
+});
+$('password').addEventListener('keydown', e => { if (e.key === 'Enter') $('login-btn').click(); });
+$('logout-btn').addEventListener('click', () => signOut(auth));
+$('refresh-btn').addEventListener('click', loadData);
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    $('login-view').classList.add('hidden');
+    $('dash-view').classList.remove('hidden');
+    $('who').textContent = 'Signed in as ' + user.email;
+    loadData();
+  } else {
+    $('dash-view').classList.add('hidden');
+    $('login-view').classList.remove('hidden');
+  }
+});
+
+/* ── State (kept so the filter re-renders without re-fetching) ── */
+let ALL_VISITS = [];
+let ALL_EVENTS = [];
+let UNIQUE = 0;
+
+/* ── Data ── */
+async function loadData() {
+  $('loading').classList.remove('hidden');
+  $('content').classList.add('hidden');
+  try {
+    const [visitsSnap, eventsSnap, visitorsSnap] = await Promise.all([
+      getDocs(query(collection(db, 'visits'), orderBy('createdAt', 'desc'), limit(500))),
+      getDocs(query(collection(db, 'events'), orderBy('createdAt', 'desc'), limit(500))),
+      getDocs(collection(db, 'visitors')),
+    ]);
+    ALL_VISITS = visitsSnap.docs.map(d => d.data());
+    ALL_EVENTS = eventsSnap.docs.map(d => d.data());
+    UNIQUE = visitorsSnap.size;
+    render();
+  } catch (e) {
+    $('loading').textContent = 'Error loading data: ' + (e.code || e.message);
+    return;
+  }
+  $('loading').classList.add('hidden');
+  $('content').classList.remove('hidden');
+}
+
+/* ── Platform / OS / browser detection from the user agent ── */
+function detectOS(ua = '') {
+  ua = ua.toLowerCase();
+  if (/android/.test(ua)) return 'Android';
+  if (/iphone|ipad|ipod/.test(ua)) return 'iOS';
+  if (/windows/.test(ua)) return 'Windows';
+  if (/mac os|macintosh/.test(ua)) return 'macOS';
+  if (/linux/.test(ua)) return 'Linux';
+  return 'Other';
+}
+function detectBrowser(ua = '') {
+  if (/Edg\//.test(ua)) return 'Edge';
+  if (/OPR\/|Opera/.test(ua)) return 'Opera';
+  if (/SamsungBrowser/.test(ua)) return 'Samsung';
+  if (/Chrome\//.test(ua)) return 'Chrome';
+  if (/Firefox\//.test(ua)) return 'Firefox';
+  if (/Safari\//.test(ua)) return 'Safari';
+  return 'Other';
+}
+// Buckets a visit into Android / iOS / Desktop (web)
+function platformCategory(v) {
+  const os = detectOS(v.userAgent || '');
+  if (os === 'Android') return 'Android';
+  if (os === 'iOS') return 'iOS';
+  return 'Desktop';
+}
+
+/* ── Security: escape any visitor-supplied text before it
+      touches innerHTML (prevents stored XSS from spoofed
+      referrers / user-agents / ISP names). ── */
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+}
+
+/* ── Helpers ── */
+function tally(arr, keyFn) {
+  const m = {};
+  arr.forEach(x => { const k = keyFn(x); if (k) m[k] = (m[k] || 0) + 1; });
+  return Object.entries(m).sort((a, b) => b[1] - a[1]);
+}
+function bars(el, pairs, max = 6) {
+  const top = pairs.slice(0, max);
+  const hi = top.length ? top[0][1] : 1;
+  el.innerHTML = top.length
+    ? top.map(([lab, n]) => `
+      <div class="bar">
+        <span class="lab" title="${esc(lab)}">${esc(lab)}</span>
+        <span class="track"><span class="fill" style="width:${Math.round(n / hi * 100)}%"></span></span>
+        <span class="val">${n}</span>
+      </div>`).join('')
+    : '<p style="color:var(--muted);font-size:.82rem;margin:0">No data yet.</p>';
+}
+function fmt(ts) {
+  try {
+    const d = ts?.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleString();
+  } catch { return '-'; }
+}
+
+/* ── Cross table: location × platform ── */
+function crossTable(visits) {
+  const loc = {}; // "City, Country" → {Android, iOS, Desktop, total}
+  visits.forEach(v => {
+    const city = v.ipLocation?.city;
+    const country = v.ipLocation?.country;
+    const key = (city ? city + ', ' : '') + (country || 'Unknown');
+    if (!loc[key]) loc[key] = { Android: 0, iOS: 0, Desktop: 0, total: 0 };
+    loc[key][platformCategory(v)]++;
+    loc[key].total++;
+  });
+  const rows = Object.entries(loc).sort((a, b) => b[1].total - a[1].total).slice(0, 25);
+  $('crosstab').innerHTML = rows.length
+    ? rows.map(([place, c]) => {
+        const cell = (n, all) => `<td class="num${(n === all && n > 0) ? ' hi' : ''}">${n}</td>`;
+        const top = Math.max(c.Android, c.iOS, c.Desktop);
+        return `<tr>
+          <td>${esc(place)}</td>
+          ${cell(c.Android, top)}${cell(c.iOS, top)}${cell(c.Desktop, top)}
+          <td class="num" style="font-weight:700">${c.total}</td>
+        </tr>`;
+      }).join('')
+    : '<tr><td colspan="5" style="color:var(--muted)">No data yet.</td></tr>';
+}
+
+/* ── Main render (respects all filters) ── */
+function render() {
+  const platform = $('platform-filter').value;
+  const vpnMode = $('vpn-filter').value;
+  const hideInternal = $('hide-internal').checked;
+
+  let visits = ALL_VISITS;
+  if (hideInternal)          visits = visits.filter(v => !v.internal);
+  if (platform !== 'all')    visits = visits.filter(v => platformCategory(v) === platform);
+  if (vpnMode === 'exclude') visits = visits.filter(v => !v.isVpn);
+  if (vpnMode === 'only')    visits = visits.filter(v => v.isVpn);
+
+  const visitorIds = new Set(visits.map(v => v.visitorId));
+  const returning = visits.filter(v => v.isReturning).length;
+  const mobile = visits.filter(v => v.deviceType === 'mobile').length;
+  const vpnCount = visits.filter(v => v.isVpn).length;
+
+  $('cards').innerHTML = `
+    ${statCard(visits.length, 'Visits (filtered)')}
+    ${statCard(visitorIds.size, 'Unique Visitors')}
+    ${statCard(returning, 'Returning Visits')}
+    ${statCard(mobile, 'Mobile Visits')}
+    ${statCard(vpnCount, 'VPN / Proxy Visits')}
+  `;
+
+  bars($('os'),        tally(visits, v => detectOS(v.userAgent)));
+  bars($('browsers'),  tally(visits, v => detectBrowser(v.userAgent)));
+  bars($('countries'), tally(visits, v => v.ipLocation?.country));
+  bars($('cities'),    tally(visits, v => v.ipLocation?.city));
+  bars($('devices'),   tally(visits, v => v.deviceType));
+  bars($('events'),    tally(ALL_EVENTS, e => e.event), 10);
+
+  crossTable(visits);
+
+  $('rows').innerHTML = visits.slice(0, 200).map(v => {
+    return `<tr>
+      <td>${fmt(v.createdAt || v.clientTime)}</td>
+      <td>${v.isReturning ? '<span class="tag ret">Returning</span>' : '<span class="tag new">New</span>'}</td>
+      <td>${esc(v.ipLocation?.city || '-')}</td>
+      <td>${esc(v.ipLocation?.country || '-')}</td>
+      <td>${detectOS(v.userAgent)}</td>
+      <td>${detectBrowser(v.userAgent)}</td>
+      <td>${v.isVpn ? `<span class="tag vpn" title="${esc((v.vpnReasons||[]).join(', '))}">VPN</span>` : '—'}</td>
+      <td>${esc((v.referrer && v.referrer !== 'direct') ? v.referrer.replace(/^https?:\/\//,'').slice(0,24) : (v.utm?.utm_source || 'direct'))}</td>
+      <td>${v.secondsOnPage != null ? v.secondsOnPage + 's' : '-'}</td>
+    </tr>`;
+  }).join('');
+}
+
+$('platform-filter').addEventListener('change', render);
+$('vpn-filter').addEventListener('change', render);
+$('hide-internal').addEventListener('change', render);
+
+function statCard(n, label) {
+  return `<div class="stat"><div class="n">${n}</div><div class="l">${label}</div></div>`;
+}
+</script>
+</body>
+</html>
