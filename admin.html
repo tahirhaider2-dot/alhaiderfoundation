@@ -328,12 +328,40 @@ const $    = id => document.getElementById(id);
 /* ════════════════════════════════════════
    AUTH
 ════════════════════════════════════════ */
+function authErrorHelp(code) {
+  switch (code) {
+    case 'auth/operation-not-allowed':
+      return 'Email/Password sign-in is NOT enabled. Firebase Console → Authentication → Sign-in method → enable "Email/Password".';
+    case 'auth/invalid-credential':
+    case 'auth/wrong-password':
+    case 'auth/user-not-found':
+      return 'Wrong email/password, or no admin user exists yet. Firebase Console → Authentication → Users → Add user.';
+    case 'auth/invalid-email':
+      return 'That email address is not valid.';
+    case 'auth/invalid-api-key':
+      return 'The Firebase API key in firebase-config.js is wrong.';
+    case 'auth/unauthorized-domain':
+      return 'This domain is not authorized. Firebase Console → Authentication → Settings → Authorized domains → add alhaiderfoundation.com';
+    case 'auth/network-request-failed':
+      return 'Network blocked. Check internet / ad-blocker, and add your domain to Firebase authorized domains.';
+    case 'auth/too-many-requests':
+      return 'Too many attempts. Wait a few minutes and try again.';
+    default:
+      return code || 'Unknown error.';
+  }
+}
+
 $('login-btn').addEventListener('click', async () => {
   $('login-err').textContent = '';
+  const btn = $('login-btn');
+  btn.disabled = true; btn.textContent = 'Signing in…';
   try {
     await signInWithEmailAndPassword(auth, $('email').value.trim(), $('password').value);
   } catch (e) {
-    $('login-err').textContent = 'Login failed: ' + (e.code || e.message);
+    console.error('[admin] sign-in failed:', e);
+    $('login-err').textContent = authErrorHelp(e.code || e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Sign In';
   }
 });
 $('password').addEventListener('keydown', e => { if (e.key === 'Enter') $('login-btn').click(); });
@@ -391,7 +419,18 @@ async function loadData() {
     render();
     startAutoRefresh();
   } catch (e) {
-    $('loading').textContent = 'Error: ' + (e.code || e.message);
+    console.error('[admin] data load failed:', e);
+    let msg = e.code || e.message;
+    if (e.code === 'permission-denied' || /permission/i.test(e.message || '')) {
+      msg = 'Permission denied reading Firestore. Publish the security rules from README.md (they allow "read: if request.auth != null"), and confirm the Firestore database exists.';
+    } else if (e.code === 'unavailable') {
+      msg = 'Firestore is unreachable. Check your internet connection / that the database was created in this project.';
+    } else if (e.code === 'failed-precondition') {
+      msg = 'A Firestore index is required — open the browser console (F12) and click the link Firebase prints to auto-create it.';
+    }
+    $('loading').innerHTML = '⚠️ ' + msg +
+      '<br><br><button class="btn" id="retry-btn">Retry</button>';
+    document.getElementById('retry-btn')?.addEventListener('click', loadData);
     return;
   }
   $('loading').classList.add('hidden');
@@ -438,7 +477,7 @@ const CITY_PROVINCE = {
   jhelum:'Punjab', mianwali:'Punjab', bhakkar:'Punjab', layyah:'Punjab',
   'muzaffargarh':'Punjab','dera ghazi khan':'Punjab','rahim yar khan':'Punjab',
   bahawalnagar:'Punjab', vehari:'Punjab', sahiwal:'Punjab', okara:'Punjab',
-  khanewal:'Punjab', narowal:'Punjab', chiniot:'Punjab', toba tek singh:'Punjab',
+  khanewal:'Punjab', narowal:'Punjab', chiniot:'Punjab', 'toba tek singh':'Punjab',
   karachi:'Sindh', hyderabad:'Sindh', sukkur:'Sindh', larkana:'Sindh',
   nawabshah:'Sindh', thatta:'Sindh', jacobabad:'Sindh', shikarpur:'Sindh',
   khairpur:'Sindh', mirpurkhas:'Sindh', badin:'Sindh',
