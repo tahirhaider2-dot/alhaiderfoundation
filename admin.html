@@ -4,74 +4,158 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>Visitor Analytics — Al Haider Foundation</title>
+<title>Analytics — Al Haider Foundation</title>
 <style>
-  :root{
-    --green:#0c3b1c; --green2:#186635; --gold:#d4a017;
-    --bg:#f3f6f2; --card:#fff; --line:#e2e8e0; --muted:#5a6b60; --text:#16241b;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text)}
-  header{background:var(--green);color:#fff;padding:16px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
-  header h1{font-size:1.15rem;margin:0;font-weight:700}
-  header .sub{font-size:.8rem;opacity:.8}
-  button{cursor:pointer;font-family:inherit}
-  .btn{background:var(--gold);color:#1a1a1a;border:none;border-radius:8px;padding:9px 16px;font-weight:600;font-size:.85rem}
-  .btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.4)}
-  main{max-width:1100px;margin:0 auto;padding:22px}
+:root {
+  --green:#0c3b1c; --green2:#186635; --green3:#1f8040;
+  --gold:#d4a017; --gold2:#b8860b;
+  --red:#c0392b; --orange:#e67e22;
+  --pk:#01411c;
+  --bg:#f0f4f0; --card:#fff; --line:#dde8de; --muted:#5a6b60; --text:#16241b;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
 
-  /* Login */
-  .login{max-width:360px;margin:8vh auto;background:var(--card);padding:30px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
-  .login h2{margin:0 0 6px;color:var(--green)}
-  .login p{margin:0 0 18px;color:var(--muted);font-size:.85rem}
-  .login label{display:block;font-size:.8rem;font-weight:600;margin:12px 0 5px}
-  .login input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;font-size:.9rem}
-  .login .btn{width:100%;margin-top:18px;padding:12px}
-  .err{color:#c0392b;font-size:.82rem;margin-top:12px;min-height:18px}
+/* ── Auth ── */
+.login{max-width:380px;margin:8vh auto;background:var(--card);padding:32px;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.1)}
+.login h2{color:var(--green);margin-bottom:4px;font-size:1.4rem}
+.login p{color:var(--muted);font-size:.85rem;margin-bottom:20px}
+.login label{display:block;font-size:.8rem;font-weight:600;margin:14px 0 5px;color:var(--green)}
+.login input{width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:9px;font-size:.9rem;outline:none;transition:border-color .2s}
+.login input:focus{border-color:var(--green2)}
+.login .btn{width:100%;margin-top:20px;padding:13px;font-size:1rem;border-radius:10px}
+.err{color:var(--red);font-size:.82rem;margin-top:10px;min-height:18px}
 
-  /* Stats */
-  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:22px}
-  .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
-  .stat .n{font-size:1.9rem;font-weight:800;color:var(--green)}
-  .stat .l{font-size:.78rem;color:var(--muted);margin-top:2px}
+/* ── Header ── */
+.dash-header{background:var(--green);color:#fff;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:100;box-shadow:0 2px 14px rgba(0,0,0,.28)}
+.dash-header h1{font-size:1.05rem;font-weight:700;display:flex;align-items:center;gap:8px}
+.dash-header .sub{font-size:.73rem;opacity:.7;margin-top:1px}
+.head-right{display:flex;gap:7px;flex-wrap:wrap;align-items:center;font-size:.75rem;color:rgba(255,255,255,.65)}
+.live-dot{display:inline-block;width:7px;height:7px;background:#2ecc71;border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
 
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px}
-  @media(max-width:760px){.grid2{grid-template-columns:1fr}}
-  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
-  .panel h3{margin:0 0 12px;font-size:.95rem;color:var(--green)}
-  .bar{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:.82rem}
-  .bar .lab{width:120px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .bar .track{flex:1;background:#eef2ee;border-radius:6px;height:16px;overflow:hidden}
-  .bar .fill{height:100%;background:linear-gradient(90deg,var(--green2),var(--gold))}
-  .bar .val{width:38px;text-align:right;color:var(--muted)}
+/* ── Buttons ── */
+button{cursor:pointer;font-family:inherit}
+.btn{background:var(--gold);color:#1a1a1a;border:none;border-radius:8px;padding:8px 14px;font-weight:600;font-size:.8rem;transition:opacity .15s}
+.btn:hover{opacity:.85}
+.btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.4)}
+.btn.ghost:hover{background:rgba(255,255,255,.1)}
+.btn.sm{padding:5px 11px;font-size:.76rem}
 
-  table{width:100%;border-collapse:collapse;font-size:.82rem}
-  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
-  th{color:var(--muted);font-weight:600;position:sticky;top:0;background:var(--card)}
-  .tablewrap{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:auto;max-height:520px}
-  .tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.72rem;font-weight:600}
-  .tag.new{background:#e8f5ee;color:#186635}
-  .tag.ret{background:#fdf0da;color:#a07808}
-  a.map{color:var(--green2);text-decoration:none;font-weight:600}
-  .hidden{display:none!important}
-  .loading{text-align:center;padding:40px;color:var(--muted)}
-  .filterbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:18px;font-size:.85rem}
-  .filterbar select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;font-size:.85rem;background:#fff;margin-left:5px}
-  .filterbar label{display:inline-flex;align-items:center}
-  .filterbar label.chk{gap:6px}
-  .filterbar .hint{color:var(--muted);font-size:.78rem}
-  .tag.vpn{background:#fdeaea;color:#c0392b}
-  td.num{text-align:right;font-variant-numeric:tabular-nums}
-  td.num.hi{font-weight:700;color:var(--green)}
+/* ── Main ── */
+main{max-width:1220px;margin:0 auto;padding:18px 14px 40px}
+.hidden{display:none!important}
+.loading{text-align:center;padding:70px 20px;color:var(--muted);font-size:1rem}
+
+/* ── Filter bar ── */
+.filterbar{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 15px;margin-bottom:16px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:.82rem}
+.filterbar label{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.filterbar select{padding:6px 9px;border:1px solid var(--line);border-radius:7px;font-family:inherit;font-size:.81rem;background:#fff;color:var(--text);cursor:pointer}
+.filterbar select:focus{outline:none;border-color:var(--green2)}
+.chk{gap:6px;cursor:pointer}
+.fsep{width:1px;height:20px;background:var(--line);margin:0 3px}
+.fhint{color:var(--muted);font-size:.73rem;margin-left:auto}
+
+/* ── Date tabs ── */
+.date-tabs{display:flex;gap:3px;background:#eef2ee;border-radius:8px;padding:3px}
+.date-tab{padding:4px 11px;border:none;border-radius:6px;font-size:.76rem;font-weight:600;color:var(--muted);background:transparent;cursor:pointer;transition:all .15s}
+.date-tab.active{background:#fff;color:var(--green);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+
+/* ── Stat cards ── */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:11px;margin-bottom:15px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px 16px;position:relative;overflow:hidden;transition:box-shadow .2s}
+.stat:hover{box-shadow:0 4px 16px rgba(0,0,0,.07)}
+.stat::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--green2);border-radius:13px 0 0 13px}
+.stat.gold::before{background:var(--gold)}
+.stat.red::before{background:var(--red)}
+.stat.blue::before{background:#2980b9}
+.stat.teal::before{background:#16a085}
+.stat .n{font-size:1.8rem;font-weight:800;color:var(--green);line-height:1.1}
+.stat.red .n{color:var(--red)}
+.stat .l{font-size:.72rem;color:var(--muted);margin-top:3px;font-weight:500}
+.stat .sub2{font-size:.7rem;color:var(--green2);font-weight:600;margin-top:2px}
+
+/* ── Pakistan spotlight ── */
+.pk-panel{background:var(--pk);color:#fff;border-radius:14px;padding:18px 20px;margin-bottom:15px}
+.pk-panel h3{color:#fff;font-size:.95rem;margin-bottom:13px;display:flex;align-items:center;gap:7px;opacity:.95}
+.pk-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:10px}
+.pk-stat{background:rgba(255,255,255,.1);border-radius:10px;padding:11px 14px;border:1px solid rgba(255,255,255,.14)}
+.pk-stat .n{font-size:1.55rem;font-weight:800;color:#fff;line-height:1.1}
+.pk-stat .l{font-size:.71rem;color:rgba(255,255,255,.72);margin-top:3px}
+.pk-cities-list{margin-top:12px;display:flex;flex-wrap:wrap;gap:5px}
+.pk-city-tag{background:rgba(255,255,255,.14);color:#fff;font-size:.74rem;padding:3px 9px;border-radius:20px;border:1px solid rgba(255,255,255,.18)}
+.pk-city-tag strong{font-weight:700}
+
+/* ── Grid layouts ── */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+@media(max-width:900px){.grid3{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.grid2,.grid3{grid-template-columns:1fr}}
+
+/* ── Panel ── */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:15px 17px}
+.panel h3{margin:0 0 13px;font-size:.88rem;color:var(--green);font-weight:700;display:flex;align-items:center;gap:6px}
+.panel h3 .cnt{font-size:.7rem;background:#eef2ee;color:var(--muted);padding:2px 7px;border-radius:20px;font-weight:600;margin-left:auto}
+.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+.panel-head h3{margin:0}
+
+/* ── Bar chart ── */
+.bar{display:flex;align-items:center;gap:7px;margin-bottom:7px;font-size:.8rem}
+.bar .lab{width:130px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text);font-weight:500}
+.bar .track{flex:1;background:#eef2ee;border-radius:5px;height:13px;overflow:hidden}
+.bar .fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--green2),var(--gold));transition:width .4s}
+.bar .val{width:32px;text-align:right;color:var(--muted);font-weight:600;font-size:.78rem}
+
+/* ── Province bar chart ── */
+.prov{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:.8rem}
+.prov-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.prov-lab{width:155px;flex-shrink:0;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prov-track{flex:1;background:#eef2ee;border-radius:5px;height:12px;overflow:hidden}
+.prov-fill{height:100%;border-radius:5px;transition:width .4s}
+.prov-val{width:28px;text-align:right;font-weight:600;color:var(--muted);font-size:.78rem}
+.c-punjab{background:#27ae60}.c-sindh{background:#e67e22}.c-kpk{background:#2980b9}
+.c-baloch{background:#8e44ad}.c-ajk{background:#16a085}.c-gb{background:#2c3e50}
+.c-ict{background:#c0392b}.c-other{background:#95a5a6}
+
+/* ── Hourly chart ── */
+.hour-wrap{display:flex;flex-direction:column;gap:4px}
+.hour-chart{display:flex;align-items:flex-end;gap:2px;height:70px;padding-bottom:0}
+.hour-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.hour-bar{width:100%;background:var(--green2);border-radius:2px 2px 0 0;min-height:2px;opacity:.8;cursor:pointer}
+.hour-bar:hover{opacity:1;background:var(--gold2)}
+.hour-labels{display:flex;gap:2px;padding-top:3px}
+.hour-lbl{flex:1;text-align:center;font-size:.55rem;color:var(--muted);white-space:nowrap;overflow:hidden}
+
+/* ── Tags ── */
+.tag{display:inline-block;padding:2px 7px;border-radius:20px;font-size:.7rem;font-weight:700;white-space:nowrap}
+.tag.new{background:#e8f5ee;color:#186635}
+.tag.ret{background:#fdf0da;color:#a07808}
+.tag.vpn{background:#fdeaea;color:var(--red)}
+.tag.vpn-med{background:#fdf3e0;color:#b7600a}
+.tag.vpn-low{background:#fefde0;color:#7d6b00}
+.tag.pk{background:#e0f2e9;color:var(--pk)}
+.tag.int{background:#eef2ff;color:#3555a5}
+
+/* ── Tables ── */
+.tablewrap{overflow-x:auto;max-height:460px;border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:.79rem;min-width:680px}
+th{text-align:left;padding:8px 9px;background:var(--card);color:var(--muted);font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid var(--line);position:sticky;top:0;z-index:1;white-space:nowrap}
+td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f8faf8}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+td.num.hi{font-weight:700;color:var(--green)}
+.isp-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:.74rem}
+.nodata{color:var(--muted);font-size:.81rem;text-align:center;padding:18px 0}
 </style>
 </head>
 <body>
 
-<!-- LOGIN VIEW -->
+<!-- ════════ LOGIN ════════ -->
 <div id="login-view">
   <div class="login">
     <h2>Analytics Login</h2>
-    <p>Al Haider Foundation — visitor dashboard</p>
+    <p>Al Haider Foundation — Visitor Dashboard</p>
     <label>Email</label>
     <input type="email" id="email" autocomplete="username" placeholder="you@email.com">
     <label>Password</label>
@@ -81,86 +165,152 @@
   </div>
 </div>
 
-<!-- DASHBOARD VIEW -->
+<!-- ════════ DASHBOARD ════════ -->
 <div id="dash-view" class="hidden">
-  <header>
+
+  <header class="dash-header">
     <div>
-      <h1>Visitor Analytics</h1>
+      <h1><span class="live-dot"></span> Visitor Analytics</h1>
       <div class="sub" id="who"></div>
     </div>
-    <div>
-      <button class="btn ghost" id="refresh-btn">Refresh</button>
-      <button class="btn ghost" id="logout-btn">Log out</button>
+    <div class="head-right">
+      <span id="refresh-countdown"></span>
+      <button class="btn ghost sm" id="refresh-btn">↺ Refresh</button>
+      <button class="btn sm" id="export-csv-btn">⬇ Export CSV</button>
+      <button class="btn ghost sm" id="logout-btn">Log out</button>
     </div>
   </header>
+
   <main>
-    <div id="loading" class="loading">Loading data…</div>
+    <div id="loading" class="loading">Loading analytics data…</div>
     <div id="content" class="hidden">
+
+      <!-- FILTER BAR -->
       <div class="filterbar">
+        <div class="date-tabs">
+          <button class="date-tab" data-range="today">Today</button>
+          <button class="date-tab" data-range="7d">7 Days</button>
+          <button class="date-tab" data-range="30d">30 Days</button>
+          <button class="date-tab active" data-range="all">All Time</button>
+        </div>
+        <span class="fsep"></span>
         <label>Platform:
           <select id="platform-filter">
             <option value="all">All platforms</option>
-            <option value="Android">Android only</option>
-            <option value="iOS">iOS (iPhone/iPad) only</option>
-            <option value="Desktop">Desktop / Web only</option>
+            <option value="Android">Android</option>
+            <option value="iOS">iOS</option>
+            <option value="Desktop">Desktop</option>
           </select>
         </label>
-        <label>VPN/Proxy:
+        <label>VPN:
           <select id="vpn-filter">
             <option value="all">All traffic</option>
             <option value="exclude">Exclude VPN</option>
-            <option value="only">Only VPN/Proxy</option>
+            <option value="only">VPN only</option>
           </select>
         </label>
-        <label class="chk"><input type="checkbox" id="hide-internal" checked> Hide my own visits</label>
-        <span class="hint">Everything below updates instantly.</span>
+        <label>Country:
+          <select id="country-filter">
+            <option value="all">All countries</option>
+            <option value="pk">🇵🇰 Pakistan only</option>
+            <option value="intl">International only</option>
+          </select>
+        </label>
+        <span class="fsep"></span>
+        <label class="chk"><input type="checkbox" id="hide-internal" checked> Hide my visits</label>
+        <span class="fhint" id="filter-summary">Showing all visits</span>
       </div>
 
+      <!-- OVERVIEW STATS -->
       <div class="cards" id="cards"></div>
 
-      <div class="grid2">
-        <div class="panel"><h3>Operating System</h3><div id="os"></div></div>
-        <div class="panel"><h3>Browser</h3><div id="browsers"></div></div>
+      <!-- PAKISTAN SPOTLIGHT -->
+      <div id="pk-spotlight"></div>
+
+      <!-- ROW 1: OS | Browser | Device -->
+      <div class="grid3">
+        <div class="panel"><h3>📱 Operating System</h3><div id="os"></div></div>
+        <div class="panel"><h3>🌐 Browser</h3><div id="browsers"></div></div>
+        <div class="panel"><h3>💻 Device Type</h3><div id="devices"></div></div>
       </div>
 
+      <!-- ROW 2: Countries | Pakistan Provinces -->
       <div class="grid2">
-        <div class="panel"><h3>Top Countries</h3><div id="countries"></div></div>
-        <div class="panel"><h3>Top Cities</h3><div id="cities"></div></div>
+        <div class="panel">
+          <h3>🌍 Top Countries <span class="cnt" id="country-cnt"></span></h3>
+          <div id="countries"></div>
+        </div>
+        <div class="panel">
+          <h3>🇵🇰 Pakistan — Province / Region</h3>
+          <div id="pk-regions"></div>
+        </div>
       </div>
 
+      <!-- ROW 3: Pakistan Cities | ISP Breakdown -->
       <div class="grid2">
-        <div class="panel"><h3>Devices (mobile vs desktop)</h3><div id="devices"></div></div>
-        <div class="panel"><h3>Business Events</h3><div id="events"></div></div>
+        <div class="panel">
+          <h3>📍 Pakistan Cities <span class="cnt" id="pkcity-cnt"></span></h3>
+          <div id="pk-cities"></div>
+        </div>
+        <div class="panel">
+          <h3>🏢 ISP / Network (Pakistan)</h3>
+          <div id="isps"></div>
+        </div>
       </div>
 
-      <!-- SMART CROSS TABLE: location × platform -->
-      <div class="panel" style="margin-bottom:22px">
-        <h3>Location × Platform — where do Android vs Web users come from?</h3>
+      <!-- ROW 4: VPN Analysis | Hourly Activity -->
+      <div class="grid2">
+        <div class="panel">
+          <h3>🔒 VPN &amp; Proxy Analysis</h3>
+          <div id="vpn-panel"></div>
+        </div>
+        <div class="panel">
+          <h3>🕐 Hourly Activity <span style="font-weight:400;font-size:.74rem;color:var(--muted)">(Pakistan Standard Time)</span></h3>
+          <div id="hourly"></div>
+        </div>
+      </div>
+
+      <!-- ROW 5: Events | Language Pref -->
+      <div class="grid2">
+        <div class="panel"><h3>🎯 Business Events</h3><div id="events"></div></div>
+        <div class="panel"><h3>🗣️ Language Preference</h3><div id="lang-pref"></div></div>
+      </div>
+
+      <!-- LOCATION × PLATFORM CROSS TABLE -->
+      <div class="panel" style="margin-bottom:14px">
+        <h3>📊 Location × Platform — where do Android vs Web users come from?</h3>
         <div class="tablewrap">
           <table>
             <thead><tr>
-              <th>Location</th><th>Android</th><th>iOS</th><th>Desktop/Web</th><th>Total</th>
+              <th>Location (City, Country)</th><th>Province</th>
+              <th>Android</th><th>iOS</th><th>Desktop</th><th>Total</th>
             </tr></thead>
             <tbody id="crosstab"></tbody>
           </table>
         </div>
       </div>
 
-      <div class="panel" style="margin-bottom:22px">
-        <h3>Recent Visits</h3>
+      <!-- RECENT VISITS TABLE -->
+      <div class="panel" style="margin-bottom:14px">
+        <div class="panel-head">
+          <h3>🕒 Recent Visits</h3>
+          <button class="btn sm" id="export-inline-btn">⬇ CSV</button>
+        </div>
         <div class="tablewrap">
           <table>
             <thead><tr>
-              <th>When</th><th>Type</th><th>City</th><th>Country</th>
-              <th>OS</th><th>Browser</th><th>VPN</th><th>Source</th><th>Time</th>
+              <th>When</th><th>Type</th><th>City</th><th>Province</th>
+              <th>Country</th><th>ISP</th><th>OS</th><th>Browser</th>
+              <th>VPN</th><th>Lang</th><th>Time on Page</th><th>Source</th>
             </tr></thead>
             <tbody id="rows"></tbody>
           </table>
         </div>
       </div>
-    </div>
+
+    </div><!-- /#content -->
   </main>
-</div>
+</div><!-- /#dash-view -->
 
 <script type="module">
 import { firebaseConfig } from './firebase-config.js';
@@ -170,13 +320,14 @@ import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
 import { getFirestore, collection, getDocs, query, orderBy, limit }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
-const app = initializeApp(firebaseConfig);
+const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
+const db   = getFirestore(app);
+const $    = id => document.getElementById(id);
 
-const $ = id => document.getElementById(id);
-
-/* ── Auth ── */
+/* ════════════════════════════════════════
+   AUTH
+════════════════════════════════════════ */
 $('login-btn').addEventListener('click', async () => {
   $('login-err').textContent = '';
   try {
@@ -186,8 +337,8 @@ $('login-btn').addEventListener('click', async () => {
   }
 });
 $('password').addEventListener('keydown', e => { if (e.key === 'Enter') $('login-btn').click(); });
-$('logout-btn').addEventListener('click', () => signOut(auth));
-$('refresh-btn').addEventListener('click', loadData);
+$('logout-btn').addEventListener('click', () => { clearInterval(autoRefreshTimer); signOut(auth); });
+$('refresh-btn').addEventListener('click', () => { countdown = 0; loadData(); });
 
 onAuthStateChanged(auth, user => {
   if (user) {
@@ -201,175 +352,595 @@ onAuthStateChanged(auth, user => {
   }
 });
 
-/* ── State (kept so the filter re-renders without re-fetching) ── */
-let ALL_VISITS = [];
-let ALL_EVENTS = [];
-let UNIQUE = 0;
+/* ════════════════════════════════════════
+   STATE
+════════════════════════════════════════ */
+let ALL_VISITS  = [];
+let ALL_EVENTS  = [];
+let FILTERED    = [];
+let autoRefreshTimer = null;
+let countdown   = 120;
 
-/* ── Data ── */
+/* ════════════════════════════════════════
+   AUTO-REFRESH (every 2 min)
+════════════════════════════════════════ */
+function startAutoRefresh() {
+  clearInterval(autoRefreshTimer);
+  countdown = 120;
+  autoRefreshTimer = setInterval(() => {
+    countdown--;
+    const el = $('refresh-countdown');
+    if (el) el.textContent = `Auto-refresh in ${countdown}s`;
+    if (countdown <= 0) { loadData(); countdown = 120; }
+  }, 1000);
+}
+
+/* ════════════════════════════════════════
+   DATA LOAD
+════════════════════════════════════════ */
 async function loadData() {
   $('loading').classList.remove('hidden');
   $('content').classList.add('hidden');
   try {
-    const [visitsSnap, eventsSnap, visitorsSnap] = await Promise.all([
-      getDocs(query(collection(db, 'visits'), orderBy('createdAt', 'desc'), limit(500))),
-      getDocs(query(collection(db, 'events'), orderBy('createdAt', 'desc'), limit(500))),
-      getDocs(collection(db, 'visitors')),
+    const [vSnap, eSnap] = await Promise.all([
+      getDocs(query(collection(db, 'visits'),  orderBy('createdAt', 'desc'), limit(1000))),
+      getDocs(query(collection(db, 'events'),  orderBy('createdAt', 'desc'), limit(1000))),
     ]);
-    ALL_VISITS = visitsSnap.docs.map(d => d.data());
-    ALL_EVENTS = eventsSnap.docs.map(d => d.data());
-    UNIQUE = visitorsSnap.size;
+    ALL_VISITS = vSnap.docs.map(d => d.data());
+    ALL_EVENTS = eSnap.docs.map(d => d.data());
     render();
+    startAutoRefresh();
   } catch (e) {
-    $('loading').textContent = 'Error loading data: ' + (e.code || e.message);
+    $('loading').textContent = 'Error: ' + (e.code || e.message);
     return;
   }
   $('loading').classList.add('hidden');
   $('content').classList.remove('hidden');
 }
 
-/* ── Platform / OS / browser detection from the user agent ── */
+/* ════════════════════════════════════════
+   DETECTION HELPERS
+════════════════════════════════════════ */
 function detectOS(ua = '') {
-  ua = ua.toLowerCase();
-  if (/android/.test(ua)) return 'Android';
-  if (/iphone|ipad|ipod/.test(ua)) return 'iOS';
-  if (/windows/.test(ua)) return 'Windows';
-  if (/mac os|macintosh/.test(ua)) return 'macOS';
-  if (/linux/.test(ua)) return 'Linux';
+  if (/android/i.test(ua))           return 'Android';
+  if (/iphone|ipad|ipod/i.test(ua))  return 'iOS';
+  if (/windows/i.test(ua))           return 'Windows';
+  if (/mac os|macintosh/i.test(ua))  return 'macOS';
+  if (/linux/i.test(ua))             return 'Linux';
   return 'Other';
 }
 function detectBrowser(ua = '') {
-  if (/Edg\//.test(ua)) return 'Edge';
-  if (/OPR\/|Opera/.test(ua)) return 'Opera';
-  if (/SamsungBrowser/.test(ua)) return 'Samsung';
-  if (/Chrome\//.test(ua)) return 'Chrome';
-  if (/Firefox\//.test(ua)) return 'Firefox';
-  if (/Safari\//.test(ua)) return 'Safari';
+  if (/Edg\//.test(ua))              return 'Edge';
+  if (/OPR\/|Opera/.test(ua))        return 'Opera';
+  if (/SamsungBrowser/.test(ua))     return 'Samsung';
+  if (/Chrome\//.test(ua))           return 'Chrome';
+  if (/Firefox\//.test(ua))          return 'Firefox';
+  if (/Safari\//.test(ua))           return 'Safari';
   return 'Other';
 }
-// Buckets a visit into Android / iOS / Desktop (web)
 function platformCategory(v) {
   const os = detectOS(v.userAgent || '');
   if (os === 'Android') return 'Android';
-  if (os === 'iOS') return 'iOS';
+  if (os === 'iOS')     return 'iOS';
   return 'Desktop';
 }
 
-/* ── Security: escape any visitor-supplied text before it
-      touches innerHTML (prevents stored XSS from spoofed
-      referrers / user-agents / ISP names). ── */
-function esc(s) {
-  return String(s == null ? '' : s).replace(/[&<>"']/g, c => (
-    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
-  ));
+/* ════════════════════════════════════════
+   PAKISTAN PROVINCE DETECTION
+   Uses ipLocation.region first, then
+   falls back to a city→province lookup.
+════════════════════════════════════════ */
+const CITY_PROVINCE = {
+  islamabad:'ICT', rawalpindi:'Punjab', lahore:'Punjab', faisalabad:'Punjab',
+  multan:'Punjab', gujranwala:'Punjab', sialkot:'Punjab', bahawalpur:'Punjab',
+  sargodha:'Punjab', sheikhupura:'Punjab', gujrat:'Punjab', jhang:'Punjab',
+  kasur:'Punjab', hafizabad:'Punjab', attock:'Punjab', chakwal:'Punjab',
+  jhelum:'Punjab', mianwali:'Punjab', bhakkar:'Punjab', layyah:'Punjab',
+  'muzaffargarh':'Punjab','dera ghazi khan':'Punjab','rahim yar khan':'Punjab',
+  bahawalnagar:'Punjab', vehari:'Punjab', sahiwal:'Punjab', okara:'Punjab',
+  khanewal:'Punjab', narowal:'Punjab', chiniot:'Punjab', toba tek singh:'Punjab',
+  karachi:'Sindh', hyderabad:'Sindh', sukkur:'Sindh', larkana:'Sindh',
+  nawabshah:'Sindh', thatta:'Sindh', jacobabad:'Sindh', shikarpur:'Sindh',
+  khairpur:'Sindh', mirpurkhas:'Sindh', badin:'Sindh',
+  peshawar:'KPK', abbottabad:'KPK', mardan:'KPK', swat:'KPK', kohat:'KPK',
+  mansehra:'KPK','dera ismail khan':'KPK', charsadda:'KPK', nowshera:'KPK',
+  haripur:'KPK', swabi:'KPK', karak:'KPK', hangu:'KPK', buner:'KPK',
+  quetta:'Balochistan', gwadar:'Balochistan', khuzdar:'Balochistan',
+  turbat:'Balochistan', hub:'Balochistan', chaman:'Balochistan',
+  'dera bugti':'Balochistan', zhob:'Balochistan',
+  muzaffarabad:'AJK', mirpur:'AJK', rawalakot:'AJK', bagh:'AJK',
+  kotli:'AJK', hattian:'AJK','neelum':'AJK',
+  gilgit:'Gilgit-Baltistan', skardu:'Gilgit-Baltistan',
+  hunza:'Gilgit-Baltistan', ghanche:'Gilgit-Baltistan', astore:'Gilgit-Baltistan',
+};
+
+const PROV_COLOR = {
+  'Punjab':'#27ae60','Sindh':'#e67e22','KPK':'#2980b9',
+  'Balochistan':'#8e44ad','AJK':'#16a085','Gilgit-Baltistan':'#2c3e50',
+  'ICT':'#c0392b','Other':'#95a5a6',
+};
+const PROV_CLASS = {
+  'Punjab':'c-punjab','Sindh':'c-sindh','KPK':'c-kpk',
+  'Balochistan':'c-baloch','AJK':'c-ajk','Gilgit-Baltistan':'c-gb',
+  'ICT':'c-ict',
+};
+
+function getProvince(v) {
+  const isPK = v.ipLocation?.country === 'Pakistan' || v.ipLocation?.countryCode === 'PK';
+  if (!isPK) return null;
+  const region = (v.ipLocation?.region || '').toLowerCase().trim();
+  const city   = (v.ipLocation?.city   || '').toLowerCase().trim();
+  if (region.includes('punjab'))                              return 'Punjab';
+  if (region.includes('sindh'))                               return 'Sindh';
+  if (region.includes('khyber')||region.includes('pakhtunkhwa')||region==='kpk'||region==='nwfp') return 'KPK';
+  if (region.includes('baloch'))                              return 'Balochistan';
+  if (region.includes('azad')||region.includes('kashmir')||region==='ajk') return 'AJK';
+  if (region.includes('gilgit')||region.includes('baltistan')||region==='gb') return 'Gilgit-Baltistan';
+  if (region.includes('islamabad')||region.includes('capital')||region==='ict') return 'ICT';
+  return CITY_PROVINCE[city] || (region ? region.charAt(0).toUpperCase()+region.slice(1,25) : 'Other');
 }
 
-/* ── Helpers ── */
+function isPK(v) {
+  return v.ipLocation?.country === 'Pakistan' || v.ipLocation?.countryCode === 'PK';
+}
+
+function getISP(v) {
+  return (v.ipLocation?.isp || v.ipLocation?.org || '')
+    .replace(/^AS\d+\s*/i, '').trim().slice(0, 28) || '—';
+}
+
+/* ════════════════════════════════════════
+   TIME HELPERS
+════════════════════════════════════════ */
+function toHourPKT(ts) {
+  try {
+    const d = ts?.toDate ? ts.toDate() : new Date(ts);
+    return (d.getUTCHours() + 5) % 24; // PKT = UTC+5:00
+  } catch { return -1; }
+}
+
+function fmt(ts) {
+  try {
+    const d = ts?.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleString('en-GB', { day:'2-digit', month:'short', year:'2-digit', hour:'2-digit', minute:'2-digit' });
+  } catch { return '—'; }
+}
+
+function formatDuration(s) {
+  if (s == null) return '—';
+  if (s < 60) return `${s}s`;
+  const m = Math.floor(s / 60), sec = s % 60;
+  return `${m}m${sec ? ` ${sec}s` : ''}`;
+}
+
+/* ════════════════════════════════════════
+   DATE FILTER
+════════════════════════════════════════ */
+function filterByDate(visits) {
+  const range = document.querySelector('.date-tab.active')?.dataset.range || 'all';
+  if (range === 'all') return visits;
+  const ms = { today: 86400000, '7d': 604800000, '30d': 2592000000 };
+  const cutoff = Date.now() - ms[range];
+  return visits.filter(v => {
+    try {
+      const d = v.createdAt?.toDate ? v.createdAt.toDate() : new Date(v.clientTime || 0);
+      return d.getTime() >= cutoff;
+    } catch { return true; }
+  });
+}
+
+/* ════════════════════════════════════════
+   XSS ESCAPE
+════════════════════════════════════════ */
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+
+/* ════════════════════════════════════════
+   CHART HELPERS
+════════════════════════════════════════ */
 function tally(arr, keyFn) {
   const m = {};
   arr.forEach(x => { const k = keyFn(x); if (k) m[k] = (m[k] || 0) + 1; });
   return Object.entries(m).sort((a, b) => b[1] - a[1]);
 }
-function bars(el, pairs, max = 6) {
+
+function bars(el, pairs, max = 8, fillStyle = '') {
+  if (!el) return;
   const top = pairs.slice(0, max);
   const hi = top.length ? top[0][1] : 1;
   el.innerHTML = top.length
     ? top.map(([lab, n]) => `
       <div class="bar">
         <span class="lab" title="${esc(lab)}">${esc(lab)}</span>
-        <span class="track"><span class="fill" style="width:${Math.round(n / hi * 100)}%"></span></span>
+        <span class="track"><span class="fill" style="width:${Math.round(n/hi*100)}%${fillStyle ? ';background:'+fillStyle : ''}"></span></span>
         <span class="val">${n}</span>
       </div>`).join('')
-    : '<p style="color:var(--muted);font-size:.82rem;margin:0">No data yet.</p>';
-}
-function fmt(ts) {
-  try {
-    const d = ts?.toDate ? ts.toDate() : new Date(ts);
-    return d.toLocaleString();
-  } catch { return '-'; }
+    : `<div class="nodata">No data yet.</div>`;
 }
 
-/* ── Cross table: location × platform ── */
-function crossTable(visits) {
-  const loc = {}; // "City, Country" → {Android, iOS, Desktop, total}
+/* ════════════════════════════════════════
+   VPN BADGE
+════════════════════════════════════════ */
+function vpnBadge(v) {
+  if (!v.isVpn) return '—';
+  const conf = v.vpnConfidence ?? 70;
+  const reasons = esc((v.vpnReasons || []).join('; '));
+  if (conf >= 70) return `<span class="tag vpn" title="${reasons}">VPN ${conf}%</span>`;
+  if (conf >= 40) return `<span class="tag vpn-med" title="${reasons}">VPN ~${conf}%</span>`;
+  return `<span class="tag vpn-low" title="${reasons}">VPN?</span>`;
+}
+
+/* ════════════════════════════════════════
+   STAT CARD
+════════════════════════════════════════ */
+function statCard(n, label, cls = '', sub = '') {
+  return `<div class="stat ${cls}">
+    <div class="n">${n}</div>
+    <div class="l">${label}</div>
+    ${sub ? `<div class="sub2">${sub}</div>` : ''}
+  </div>`;
+}
+
+/* ════════════════════════════════════════
+   RENDER — PAKISTAN SPOTLIGHT
+════════════════════════════════════════ */
+function renderPKSpotlight(visits) {
+  const pkV = visits.filter(isPK);
+  const pkPct = visits.length ? Math.round(pkV.length / visits.length * 100) : 0;
+  const cityMap = {};
+  pkV.forEach(v => { const c = v.ipLocation?.city; if (c) cityMap[c] = (cityMap[c]||0)+1; });
+  const provMap = {};
+  pkV.forEach(v => { const p = getProvince(v)||'Other'; provMap[p] = (provMap[p]||0)+1; });
+  const topCity = Object.entries(cityMap).sort((a,b)=>b[1]-a[1])[0];
+  const topProv = Object.entries(provMap).sort((a,b)=>b[1]-a[1])[0];
+  const pkVpn  = pkV.filter(v=>v.isVpn).length;
+  const pkVpnPct = pkV.length ? Math.round(pkVpn/pkV.length*100) : 0;
+  const urduPK = pkV.filter(v=>v.siteLang==='ur').length;
+  const topCities = Object.entries(cityMap).sort((a,b)=>b[1]-a[1]).slice(0,10);
+
+  $('pk-spotlight').innerHTML = `
+    <div class="pk-panel">
+      <h3>🇵🇰 Pakistan Spotlight</h3>
+      <div class="pk-stats">
+        <div class="pk-stat">
+          <div class="n">${pkV.length}</div>
+          <div class="l">Visits from Pakistan (${pkPct}% of total)</div>
+        </div>
+        <div class="pk-stat">
+          <div class="n">${topCity ? esc(topCity[0]) : '—'}</div>
+          <div class="l">Top City${topCity ? ` · ${topCity[1]} visits` : ''}</div>
+        </div>
+        <div class="pk-stat">
+          <div class="n">${topProv ? esc(topProv[0]) : '—'}</div>
+          <div class="l">Top Province${topProv ? ` · ${topProv[1]} visits` : ''}</div>
+        </div>
+        <div class="pk-stat">
+          <div class="n">${pkVpnPct}%</div>
+          <div class="l">VPN Rate among PK visitors</div>
+        </div>
+        <div class="pk-stat">
+          <div class="n">${urduPK}</div>
+          <div class="l">Used Urdu (اردو) interface</div>
+        </div>
+      </div>
+      ${topCities.length ? `<div class="pk-cities-list">
+        ${topCities.map(([c,n])=>`<span class="pk-city-tag">${esc(c)} <strong>${n}</strong></span>`).join('')}
+      </div>` : ''}
+    </div>`;
+}
+
+/* ════════════════════════════════════════
+   RENDER — PAKISTAN PROVINCES
+════════════════════════════════════════ */
+function renderPKRegions(visits) {
+  const pkV = visits.filter(isPK);
+  const provMap = {};
+  pkV.forEach(v => { const p = getProvince(v)||'Other'; provMap[p] = (provMap[p]||0)+1; });
+  const entries = Object.entries(provMap).sort((a,b)=>b[1]-a[1]);
+  const max = entries.length ? entries[0][1] : 1;
+  const el = $('pk-regions');
+  el.innerHTML = entries.length
+    ? entries.slice(0,8).map(([prov,n])=>{
+        const cc = PROV_CLASS[prov]||'c-other';
+        const pct = Math.round(n/max*100);
+        return `<div class="prov">
+          <div class="prov-dot ${cc}"></div>
+          <span class="prov-lab" title="${esc(prov)}">${esc(prov)}</span>
+          <div class="prov-track"><div class="prov-fill ${cc}" style="width:${pct}%"></div></div>
+          <span class="prov-val">${n}</span>
+        </div>`;
+      }).join('')
+    : '<div class="nodata">No Pakistan visits yet.</div>';
+}
+
+/* ════════════════════════════════════════
+   RENDER — PAKISTAN CITIES
+════════════════════════════════════════ */
+function renderPKCities(visits) {
+  const pkV = visits.filter(isPK);
+  const pairs = tally(pkV, v=>v.ipLocation?.city);
+  $('pkcity-cnt').textContent = `${pkV.length} PK visits`;
+  bars($('pk-cities'), pairs, 10);
+}
+
+/* ════════════════════════════════════════
+   RENDER — ISP (Pakistan)
+════════════════════════════════════════ */
+function renderISPs(visits) {
+  const pkV = visits.filter(isPK);
+  const ispMap = {};
+  pkV.forEach(v => {
+    const isp = (v.ipLocation?.isp||v.ipLocation?.org||'')
+      .replace(/^AS\d+\s*/i,'').trim().slice(0,30);
+    if (isp) ispMap[isp] = (ispMap[isp]||0)+1;
+  });
+  const pairs = Object.entries(ispMap).sort((a,b)=>b[1]-a[1]);
+  bars($('isps'), pairs, 8);
+}
+
+/* ════════════════════════════════════════
+   RENDER — VPN ANALYSIS
+════════════════════════════════════════ */
+function renderVPNAnalysis(visits) {
+  const vpnV = visits.filter(v=>v.isVpn);
+  const pct  = visits.length ? Math.round(vpnV.length/visits.length*100) : 0;
+  const high  = vpnV.filter(v=>(v.vpnConfidence||0)>=70).length;
+  const med   = vpnV.filter(v=>{ const c=v.vpnConfidence||0; return c>=40&&c<70; }).length;
+  const low   = vpnV.filter(v=>(v.vpnConfidence||0)<40).length;
+  const reasons = {};
+  vpnV.forEach(v=>(v.vpnReasons||[]).forEach(r=>{ reasons[r]=(reasons[r]||0)+1; }));
+  const topR = Object.entries(reasons).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const byCtry = {};
+  vpnV.forEach(v=>{ const c=v.ipLocation?.country||'Unknown'; byCtry[c]=(byCtry[c]||0)+1; });
+  const topC = Object.entries(byCtry).sort((a,b)=>b[1]-a[1]).slice(0,4);
+
+  $('vpn-panel').innerHTML = `
+    <div style="margin-bottom:10px">
+      <strong style="font-size:1.5rem;color:var(--red)">${vpnV.length}</strong>
+      <span style="color:var(--muted);font-size:.82rem"> VPN/proxy visits (${pct}% of total)</span>
+    </div>
+    ${vpnV.length ? `
+      <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+        <span class="tag vpn">High confidence ×${high}</span>
+        <span class="tag vpn-med">Medium ×${med}</span>
+        <span class="tag vpn-low">Possible ×${low}</span>
+      </div>
+      ${topR.length ? `<div style="font-size:.74rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Detection Signals</div>
+      ${topR.map(([r,n])=>`
+        <div class="bar" style="margin-bottom:6px">
+          <span class="lab" title="${esc(r)}">${esc(r)}</span>
+          <span class="track"><span class="fill" style="width:${Math.round(n/vpnV.length*100)}%;background:linear-gradient(90deg,#c0392b,#e74c3c)"></span></span>
+          <span class="val">${n}</span>
+        </div>`).join('')}` : ''}
+      ${topC.length>1 ? `<div style="font-size:.74rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin:10px 0 7px">VPN by Country</div>
+      ${topC.map(([c,n])=>`
+        <div class="bar" style="margin-bottom:6px">
+          <span class="lab">${esc(c)}</span>
+          <span class="track"><span class="fill" style="width:${Math.round(n/vpnV.length*100)}%;background:linear-gradient(90deg,#e67e22,#d35400)"></span></span>
+          <span class="val">${n}</span>
+        </div>`).join('')}` : ''}
+    ` : '<div class="nodata">No VPN visits detected.</div>'}`;
+}
+
+/* ════════════════════════════════════════
+   RENDER — HOURLY ACTIVITY (PKT)
+════════════════════════════════════════ */
+function renderHourly(visits) {
+  const h = Array(24).fill(0);
+  visits.forEach(v => { const hr = toHourPKT(v.createdAt||v.clientTime); if (hr>=0) h[hr]++; });
+  const maxH = Math.max(...h, 1);
+  const peak = h.indexOf(Math.max(...h));
+
+  const barsHtml = h.map((n, i) => {
+    const pct = Math.max(Math.round(n/maxH*100), 2);
+    const label = i%6===0 ? `${i}:00` : '';
+    return `<div class="hour-bar-wrap">
+      <div class="hour-bar" style="height:${pct}%" title="${i}:00 PKT — ${n} visit${n!==1?'s':''}"></div>
+      <div class="hour-lbl">${label}</div>
+    </div>`;
+  }).join('');
+
+  $('hourly').innerHTML = `
+    <div class="hour-wrap">
+      <div class="hour-chart">${barsHtml}</div>
+    </div>
+    <div style="font-size:.73rem;color:var(--muted);margin-top:8px;text-align:center">
+      Peak hour: <strong style="color:var(--green)">${peak}:00 – ${peak+1}:00 PKT</strong> (${h[peak]} visits)
+    </div>`;
+}
+
+/* ════════════════════════════════════════
+   RENDER — LANGUAGE PREFERENCE
+════════════════════════════════════════ */
+function renderLangPref(visits) {
+  const urdu = visits.filter(v=>v.siteLang==='ur').length;
+  const eng  = visits.length - urdu;
+  const uPct = visits.length ? Math.round(urdu/visits.length*100) : 0;
+  const el = $('lang-pref');
+  el.innerHTML = `
+    <div class="bar">
+      <span class="lab">🇵🇰 Urdu (اردو)</span>
+      <span class="track"><span class="fill" style="width:${uPct}%"></span></span>
+      <span class="val">${urdu}</span>
+    </div>
+    <div class="bar">
+      <span class="lab">English</span>
+      <span class="track"><span class="fill" style="width:${100-uPct}%"></span></span>
+      <span class="val">${eng}</span>
+    </div>
+    <p style="font-size:.73rem;color:var(--muted);margin-top:8px">${uPct}% of visitors switched to Urdu interface</p>`;
+}
+
+/* ════════════════════════════════════════
+   RENDER — LOCATION × PLATFORM CROSS TABLE
+════════════════════════════════════════ */
+function renderCrossTable(visits) {
+  const loc = {};
   visits.forEach(v => {
     const city = v.ipLocation?.city;
     const country = v.ipLocation?.country;
-    const key = (city ? city + ', ' : '') + (country || 'Unknown');
-    if (!loc[key]) loc[key] = { Android: 0, iOS: 0, Desktop: 0, total: 0 };
+    const key = (city ? city+', ':'')+( country||'Unknown');
+    if (!loc[key]) loc[key] = { Android:0, iOS:0, Desktop:0, total:0, _v: v };
     loc[key][platformCategory(v)]++;
     loc[key].total++;
   });
-  const rows = Object.entries(loc).sort((a, b) => b[1].total - a[1].total).slice(0, 25);
+  const rows = Object.entries(loc).sort((a,b)=>b[1].total-a[1].total).slice(0,25);
   $('crosstab').innerHTML = rows.length
-    ? rows.map(([place, c]) => {
-        const cell = (n, all) => `<td class="num${(n === all && n > 0) ? ' hi' : ''}">${n}</td>`;
+    ? rows.map(([place, c])=>{
         const top = Math.max(c.Android, c.iOS, c.Desktop);
+        const prov = getProvince(c._v);
+        const cell = (n)=>`<td class="num${n===top&&n>0?' hi':''}">${n}</td>`;
         return `<tr>
           <td>${esc(place)}</td>
-          ${cell(c.Android, top)}${cell(c.iOS, top)}${cell(c.Desktop, top)}
+          <td style="font-size:.75rem;color:var(--muted)">${prov ? esc(prov) : '—'}</td>
+          ${cell(c.Android)}${cell(c.iOS)}${cell(c.Desktop)}
           <td class="num" style="font-weight:700">${c.total}</td>
         </tr>`;
       }).join('')
-    : '<tr><td colspan="5" style="color:var(--muted)">No data yet.</td></tr>';
+    : '<tr><td colspan="6" class="nodata">No data yet.</td></tr>';
 }
 
-/* ── Main render (respects all filters) ── */
-function render() {
-  const platform = $('platform-filter').value;
-  const vpnMode = $('vpn-filter').value;
-  const hideInternal = $('hide-internal').checked;
-
-  let visits = ALL_VISITS;
-  if (hideInternal)          visits = visits.filter(v => !v.internal);
-  if (platform !== 'all')    visits = visits.filter(v => platformCategory(v) === platform);
-  if (vpnMode === 'exclude') visits = visits.filter(v => !v.isVpn);
-  if (vpnMode === 'only')    visits = visits.filter(v => v.isVpn);
-
-  const visitorIds = new Set(visits.map(v => v.visitorId));
-  const returning = visits.filter(v => v.isReturning).length;
-  const mobile = visits.filter(v => v.deviceType === 'mobile').length;
-  const vpnCount = visits.filter(v => v.isVpn).length;
-
-  $('cards').innerHTML = `
-    ${statCard(visits.length, 'Visits (filtered)')}
-    ${statCard(visitorIds.size, 'Unique Visitors')}
-    ${statCard(returning, 'Returning Visits')}
-    ${statCard(mobile, 'Mobile Visits')}
-    ${statCard(vpnCount, 'VPN / Proxy Visits')}
-  `;
-
-  bars($('os'),        tally(visits, v => detectOS(v.userAgent)));
-  bars($('browsers'),  tally(visits, v => detectBrowser(v.userAgent)));
-  bars($('countries'), tally(visits, v => v.ipLocation?.country));
-  bars($('cities'),    tally(visits, v => v.ipLocation?.city));
-  bars($('devices'),   tally(visits, v => v.deviceType));
-  bars($('events'),    tally(ALL_EVENTS, e => e.event), 10);
-
-  crossTable(visits);
-
-  $('rows').innerHTML = visits.slice(0, 200).map(v => {
+/* ════════════════════════════════════════
+   RENDER — RECENT VISITS TABLE
+════════════════════════════════════════ */
+function renderVisitRows(visits) {
+  $('rows').innerHTML = visits.slice(0, 250).map(v => {
+    const prov = getProvince(v);
+    const isp  = getISP(v);
+    const pkFlag = isPK(v) ? '<span class="tag pk">🇵🇰</span>' : esc(v.ipLocation?.country || '—');
+    const source = (v.referrer && v.referrer !== 'direct')
+      ? v.referrer.replace(/^https?:\/\//,'').slice(0,20)
+      : (v.utm?.utm_source || 'direct');
     return `<tr>
-      <td>${fmt(v.createdAt || v.clientTime)}</td>
-      <td>${v.isReturning ? '<span class="tag ret">Returning</span>' : '<span class="tag new">New</span>'}</td>
-      <td>${esc(v.ipLocation?.city || '-')}</td>
-      <td>${esc(v.ipLocation?.country || '-')}</td>
-      <td>${detectOS(v.userAgent)}</td>
-      <td>${detectBrowser(v.userAgent)}</td>
-      <td>${v.isVpn ? `<span class="tag vpn" title="${esc((v.vpnReasons||[]).join(', '))}">VPN</span>` : '—'}</td>
-      <td>${esc((v.referrer && v.referrer !== 'direct') ? v.referrer.replace(/^https?:\/\//,'').slice(0,24) : (v.utm?.utm_source || 'direct'))}</td>
-      <td>${v.secondsOnPage != null ? v.secondsOnPage + 's' : '-'}</td>
+      <td style="white-space:nowrap;font-size:.77rem">${fmt(v.createdAt||v.clientTime)}</td>
+      <td>${v.isReturning?'<span class="tag ret">↩ Return</span>':'<span class="tag new">✦ New</span>'}</td>
+      <td><strong>${esc(v.ipLocation?.city||'—')}</strong></td>
+      <td style="font-size:.75rem;color:var(--muted)">${prov ? `<span title="${esc(v.ipLocation?.region||'')}">${esc(prov)}</span>` : '—'}</td>
+      <td>${pkFlag}</td>
+      <td class="isp-cell" title="${esc(v.ipLocation?.isp||'')} — ${esc(v.ipLocation?.org||'')}">${esc(isp)}</td>
+      <td>${detectOS(v.userAgent||'')}</td>
+      <td>${detectBrowser(v.userAgent||'')}</td>
+      <td>${vpnBadge(v)}</td>
+      <td style="font-size:.78rem">${v.siteLang==='ur'?'🇵🇰 اردو':'EN'}</td>
+      <td style="font-size:.78rem;color:var(--muted)">${formatDuration(v.secondsOnPage)}</td>
+      <td style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.74rem;color:var(--muted)">${esc(source)}</td>
     </tr>`;
   }).join('');
 }
 
-$('platform-filter').addEventListener('change', render);
-$('vpn-filter').addEventListener('change', render);
-$('hide-internal').addEventListener('change', render);
-
-function statCard(n, label) {
-  return `<div class="stat"><div class="n">${n}</div><div class="l">${label}</div></div>`;
+/* ════════════════════════════════════════
+   CSV EXPORT
+════════════════════════════════════════ */
+function exportCSV() {
+  const visits = FILTERED;
+  const H = ['Timestamp','VisitorID','New/Return','City','Province','Country',
+    'ISP','OS','Browser','VPN','VPN_Confidence','VPN_Reasons','Language',
+    'Duration_s','Source','Device','IP'];
+  const q = s => `"${String(s==null?'':s).replace(/"/g,'""')}"`;
+  const rows = visits.map(v=>[
+    fmt(v.createdAt||v.clientTime), v.visitorId||'',
+    v.isReturning?'Returning':'New',
+    v.ipLocation?.city||'', getProvince(v)||v.ipLocation?.region||'',
+    v.ipLocation?.country||'', getISP(v),
+    detectOS(v.userAgent||''), detectBrowser(v.userAgent||''),
+    v.isVpn?'Yes':'No', v.vpnConfidence??'', (v.vpnReasons||[]).join('; '),
+    v.siteLang||'en', v.secondsOnPage??'',
+    (v.referrer&&v.referrer!=='direct')?v.referrer:(v.utm?.utm_source||'direct'),
+    v.deviceType||'', v.ipLocation?.ip||'',
+  ].map(q));
+  const csv = [H.join(','), ...rows.map(r=>r.join(','))].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download = `ahf-analytics-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
 }
+$('export-csv-btn').addEventListener('click', exportCSV);
+$('export-inline-btn').addEventListener('click', exportCSV);
+
+/* ════════════════════════════════════════
+   MAIN RENDER
+════════════════════════════════════════ */
+function render() {
+  const platform    = $('platform-filter').value;
+  const vpnMode     = $('vpn-filter').value;
+  const countryMode = $('country-filter').value;
+  const hideInternal = $('hide-internal').checked;
+
+  let visits = filterByDate(ALL_VISITS);
+  if (hideInternal)          visits = visits.filter(v=>!v.internal);
+  if (platform !== 'all')    visits = visits.filter(v=>platformCategory(v)===platform);
+  if (vpnMode === 'exclude') visits = visits.filter(v=>!v.isVpn);
+  if (vpnMode === 'only')    visits = visits.filter(v=>v.isVpn);
+  if (countryMode === 'pk')  visits = visits.filter(isPK);
+  if (countryMode === 'intl')visits = visits.filter(v=>!isPK(v));
+  FILTERED = visits;
+
+  // Filter summary
+  $('filter-summary').textContent = `${visits.length} visit${visits.length!==1?'s':''} shown`;
+
+  // Overview stats
+  const uids     = new Set(visits.map(v=>v.visitorId));
+  const returning = visits.filter(v=>v.isReturning).length;
+  const mobile    = visits.filter(v=>v.deviceType==='mobile').length;
+  const vpnCount  = visits.filter(v=>v.isVpn).length;
+  const pkCount   = visits.filter(isPK).length;
+  const avgTime   = visits.filter(v=>v.secondsOnPage).reduce((s,v)=>s+(v.secondsOnPage||0),0);
+  const avgTimeV  = visits.filter(v=>v.secondsOnPage).length;
+  const urduCount = visits.filter(v=>v.siteLang==='ur').length;
+
+  // Today's visits from ALL_VISITS
+  const todayCutoff = Date.now() - 86400000;
+  const todayCount = ALL_VISITS.filter(v => {
+    try { const d=v.createdAt?.toDate?v.createdAt.toDate():new Date(v.clientTime||0); return !v.internal&&d.getTime()>=todayCutoff; } catch { return false; }
+  }).length;
+
+  $('cards').innerHTML = `
+    ${statCard(visits.length, 'Total Visits', '', `${uids.size} unique visitors`)}
+    ${statCard(uids.size, 'Unique Visitors', 'teal', `${returning} returning`)}
+    ${statCard(mobile, 'Mobile Visits', 'blue', `${visits.length-mobile} desktop`)}
+    ${statCard(pkCount, 'Pakistan Visits', '', `${visits.length?Math.round(pkCount/visits.length*100):0}% of total`)}
+    ${statCard(vpnCount, 'VPN / Proxy', 'red', `${visits.length?Math.round(vpnCount/visits.length*100):0}% of total`)}
+    ${statCard(urduCount, 'Urdu Users', 'gold', `${visits.length?Math.round(urduCount/visits.length*100):0}% used اردو`)}
+    ${statCard(avgTimeV ? Math.round(avgTime/avgTimeV)+'s' : '—', 'Avg. Time on Page', '', avgTimeV ? `${Math.round(avgTime/avgTimeV/60*10)/10} min avg` : '')}
+    ${statCard(todayCount, "Today's Visits", '', `last 24 hours`)}
+  `;
+
+  // Country count badge
+  const uniqueCountries = new Set(visits.map(v=>v.ipLocation?.country).filter(Boolean));
+  $('country-cnt').textContent = uniqueCountries.size + ' countries';
+
+  // All panels
+  renderPKSpotlight(visits);
+  bars($('os'),        tally(visits, v=>detectOS(v.userAgent)));
+  bars($('browsers'),  tally(visits, v=>detectBrowser(v.userAgent)));
+  bars($('devices'),   tally(visits, v=>v.deviceType==='mobile'?'Mobile':'Desktop'));
+  bars($('countries'), tally(visits, v=>v.ipLocation?.country), 8);
+  renderPKRegions(visits);
+  renderPKCities(visits);
+  renderISPs(visits);
+  renderVPNAnalysis(visits);
+  renderHourly(visits);
+  bars($('events'),    tally(ALL_EVENTS, e=>e.event), 10);
+  renderLangPref(visits);
+  renderCrossTable(visits);
+  renderVisitRows(visits);
+}
+
+/* ════════════════════════════════════════
+   FILTER EVENT LISTENERS
+════════════════════════════════════════ */
+['platform-filter','vpn-filter','country-filter','hide-internal'].forEach(id => {
+  $(id)?.addEventListener('change', render);
+});
+document.querySelectorAll('.date-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.date-tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    render();
+  });
+});
 </script>
 </body>
 </html>

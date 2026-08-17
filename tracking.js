@@ -251,21 +251,78 @@ const VPN_KEYWORDS = [
   'vpn','proxy','tor exit','tor network','datapacket','g-core','psychz',
 ];
 
+/* ── Pakistani Legitimate ISPs whitelist ──
+   Prevents false-positive VPN flags on real Pakistani ISP names.
+   Any ISP matching here is excluded from the datacenter keyword check. */
+const PAKISTAN_LEGITIMATE_ISPS = [
+  'ptcl','pakistan telecommunication','paktel','ptml',
+  'zong','cmpak','china mobile pakistan',
+  'jazz','mobilink','warid','jazztel','jazzconnect',
+  'telenor pakistan','telenor pk',
+  'ufone','pktelecom','u-fone',
+  'nayatel','stormfiber','wateen',
+  'worldcall','sco','special communications',
+  'transworld','twc','multinet','cybernet','fascom',
+  'wi-tribe','brain telecommunication','linkdotnet','supernet',
+  'micronet','sharp computing','nexlinx','comsats',
+  'beep','ntc','fiberlink','onic',
+];
+
 function detectVpn(ipLoc) {
-  if (!ipLoc) return { isVpn: false, reasons: [] };
+  if (!ipLoc) return { isVpn: false, confidence: 0, reasons: [] };
   const reasons = [];
+  let score = 0;
 
   const org = `${ipLoc.isp || ''} ${ipLoc.org || ''}`.toLowerCase();
-  if (org && VPN_KEYWORDS.some(k => org.includes(k))) reasons.push('datacenter/VPN network');
-
+  const country = (ipLoc.country || '').toLowerCase();
   const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
   const ipTz = ipLoc.timezone || '';
-  if (ipTz && browserTz && ipTz !== browserTz) {
-    const a = ipTz.split('/')[0], b = browserTz.split('/')[0];
-    if (a && b && a !== b) reasons.push('timezone/country mismatch');
+
+  /* ── Signal 1: Datacenter / VPN ISP ──
+     Skip check if ISP is a known legitimate Pakistani provider
+     to eliminate false positives on PTCL, Jazz, Zong, etc. */
+  const isPakistaniLegitISP = PAKISTAN_LEGITIMATE_ISPS.some(k => org.includes(k));
+  if (!isPakistaniLegitISP && org && VPN_KEYWORDS.some(k => org.includes(k))) {
+    reasons.push('datacenter/VPN ISP');
+    score += 55;
   }
 
-  return { isVpn: reasons.length > 0, reasons };
+  /* ── Signal 2: Timezone mismatch ── */
+  if (ipTz && browserTz && ipTz !== browserTz) {
+    const ipRegion = ipTz.split('/')[0];
+    const brRegion = browserTz.split('/')[0];
+    if (ipRegion && brRegion && ipRegion !== brRegion) {
+      // Different continent (e.g., Asia vs Europe) — strong signal
+      reasons.push('IP timezone ≠ browser timezone');
+      score += 40;
+    } else {
+      // Same continent, different city (e.g., Asia/Karachi vs Asia/Dubai)
+      reasons.push('IP city timezone ≠ browser timezone');
+      score += 18;
+    }
+  }
+
+  /* ── Signal 3: Pakistan-specific — IP says PK but browser TZ is not PKT ──
+     Pakistan Standard Time = Asia/Karachi (UTC+5:00).
+     Real Pakistani users almost always have Asia/Karachi in their browser. */
+  if (country === 'pakistan' && browserTz && browserTz !== 'Asia/Karachi') {
+    reasons.push('Pakistan IP but non-PKT browser timezone');
+    score += 28;
+  }
+
+  /* ── Signal 4: IP type field (if returned by API) ── */
+  const ipType = (ipLoc.type || '').toLowerCase();
+  if (ipType && (ipType.includes('datacenter') || ipType.includes('hosting') || ipType.includes('vpn'))) {
+    reasons.push('datacenter IP type flag');
+    score += 45;
+  }
+
+  const confidence = Math.min(score, 100);
+  return {
+    isVpn: confidence >= 40,
+    confidence,
+    reasons,
+  };
 }
 
 /* ════════════════════════════════════════
@@ -301,6 +358,7 @@ async function saveVisit() {
         isReturning, visitCount,
         internal: isInternal,
         isVpn: vpn.isVpn,
+        vpnConfidence: vpn.confidence,
         vpnReasons: vpn.reasons,
         createdAt: serverTimestamp(),
         clientTime: new Date().toISOString(),
