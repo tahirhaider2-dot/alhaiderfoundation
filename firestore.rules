@@ -1,0 +1,104 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      let adminPath = /databases/$(database)/documents/admins/$(request.auth.uid);
+      return request.auth != null
+        && exists(adminPath)
+        && get(adminPath).data.enabled == true;
+    }
+
+    function validVisit() {
+      let data = request.resource.data;
+      return data.keys().hasOnly([
+          'visitorId', 'sessionId', 'isReturning', 'visitCount', 'internal',
+          'isVpn', 'vpnConfidence', 'vpnReasons', 'createdAt', 'clientTime',
+          'userAgent', 'deviceType', 'platform', 'vendor', 'language',
+          'languages', 'screen', 'colorDepth', 'viewport', 'pixelRatio',
+          'cpuCores', 'deviceMemoryGB', 'touchPoints', 'gpu',
+          'deviceFingerprint', 'connection', 'cookiesEnabled', 'doNotTrack',
+          'timezone', 'online', 'referrer', 'landingPage', 'siteLang', 'utm',
+          'ipLocation'
+        ])
+        && data.keys().hasAll([
+          'visitorId', 'sessionId', 'isReturning', 'visitCount', 'internal',
+          'isVpn', 'vpnConfidence', 'vpnReasons', 'createdAt', 'clientTime',
+          'deviceType', 'deviceFingerprint', 'utm', 'ipLocation'
+        ])
+        && data.size() <= 40
+        && data.visitorId is string
+        && data.visitorId.size() <= 100
+        && data.sessionId is string
+        && data.sessionId.size() <= 100
+        && data.isReturning is bool
+        && data.visitCount is int
+        && data.visitCount > 0
+        && data.internal is bool
+        && data.isVpn is bool
+        && data.vpnConfidence is int
+        && data.vpnConfidence >= 0
+        && data.vpnConfidence <= 100
+        && data.vpnReasons is list
+        && data.vpnReasons.size() <= 20
+        && data.createdAt is timestamp
+        && data.clientTime is string
+        && data.clientTime.size() <= 40
+        && data.deviceType in ['mobile', 'desktop']
+        && data.deviceFingerprint is string
+        && data.deviceFingerprint.size() <= 64
+        && data.utm is map
+        && data.utm.size() <= 7
+        && (data.ipLocation == null || (data.ipLocation is map && data.ipLocation.size() <= 20));
+    }
+
+    function validEvent() {
+      let data = request.resource.data;
+      return data.keys().hasOnly([
+          'event', 'visitorId', 'sessionId', 'page', 'createdAt',
+          'clientTime', 'amount', 'purpose'
+        ])
+        && data.keys().hasAll([
+          'event', 'visitorId', 'sessionId', 'page', 'createdAt', 'clientTime'
+        ])
+        && data.size() <= 8
+        && data.event in [
+          'app_download_click', 'apk_click', 'donate_click', 'whatsapp_click',
+          'call_click', 'email_click', 'gallery_view', 'contact_form_submit',
+          'donate_form_submit'
+        ]
+        && data.visitorId is string
+        && data.visitorId.size() <= 100
+        && data.sessionId is string
+        && data.sessionId.size() <= 100
+        && data.page is string
+        && data.page.size() <= 512
+        && data.createdAt is timestamp
+        && data.clientTime is string
+        && data.clientTime.size() <= 40
+        && (!('amount' in data) || data.amount == null || (data.amount is string && data.amount.size() <= 50))
+        && (!('purpose' in data) || data.purpose == null || (data.purpose is string && data.purpose.size() <= 120));
+    }
+
+    match /admins/{uid} {
+      allow read, write: if false;
+    }
+
+    match /visits/{visitId} {
+      allow create: if validVisit();
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['secondsOnPage'])
+        && request.resource.data.secondsOnPage is int
+        && request.resource.data.secondsOnPage >= 0
+        && request.resource.data.secondsOnPage <= 86400;
+      allow read, delete: if isAdmin();
+    }
+
+    match /events/{eventId} {
+      allow create: if validEvent();
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

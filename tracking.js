@@ -19,11 +19,13 @@
    + security rules + the admin dashboard (admin.html).
    ======================================================== */
 
-import { firebaseConfig, TRACKING_ENABLED } from './firebase-config.js';
+import { firebaseConfig, firebaseAppCheckSiteKey, TRACKING_ENABLED } from './firebase-config.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { initializeAppCheck, ReCaptchaV3Provider }
+  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check.js';
 import {
   getFirestore, collection, addDoc, doc, setDoc,
-  serverTimestamp, increment
+  serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 /* ── Bail out early if Firebase isn't configured yet ── */
@@ -35,6 +37,12 @@ let db = null;
 if (TRACKING_ENABLED) {
   try {
     const app = initializeApp(firebaseConfig);
+    if (firebaseAppCheckSiteKey) {
+      initializeAppCheck(app, {
+        provider: new ReCaptchaV3Provider(firebaseAppCheckSiteKey),
+        isTokenAutoRefreshEnabled: true,
+      });
+    }
     db = getFirestore(app);
   } catch (err) {
     console.warn('[tracking] Firebase init failed:', err);
@@ -336,22 +344,7 @@ async function saveVisit() {
   const ipLocation = await getIpLocation();
   const vpn = detectVpn(ipLocation);
 
-  // 1) Upsert a per-visitor profile doc (aggregate view of this person).
   if (db) {
-    try {
-      await setDoc(doc(db, 'visitors', visitorId), {
-        visitorId,
-        lastSeen: serverTimestamp(),
-        lastCity: ipLocation?.city || null,
-        lastCountry: ipLocation?.country || null,
-        totalVisits: increment(1),
-        deviceType: device.deviceType,
-        internal: isInternal,
-        firstSeen: localStorage.getItem(LS.firstSeen) || new Date().toISOString(),
-      }, { merge: true });
-    } catch (e) { console.warn('[tracking] visitor upsert failed', e); }
-
-    // 2) Add a detailed record for THIS individual visit.
     try {
       const ref = await addDoc(collection(db, 'visits'), {
         visitorId, sessionId,

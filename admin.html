@@ -313,14 +313,22 @@ td.num.hi{font-weight:700;color:var(--green)}
 </div><!-- /#dash-view -->
 
 <script type="module">
-import { firebaseConfig } from './firebase-config.js';
+import { firebaseConfig, firebaseAppCheckSiteKey } from './firebase-config.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { initializeAppCheck, ReCaptchaV3Provider }
+  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check.js';
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { getFirestore, collection, getDocs, query, orderBy, limit }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 const app  = initializeApp(firebaseConfig);
+if (firebaseAppCheckSiteKey) {
+  initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider(firebaseAppCheckSiteKey),
+    isTokenAutoRefreshEnabled: true,
+  });
+}
 const auth = getAuth(app);
 const db   = getFirestore(app);
 const $    = id => document.getElementById(id);
@@ -422,7 +430,7 @@ async function loadData() {
     console.error('[admin] data load failed:', e);
     let msg = e.code || e.message;
     if (e.code === 'permission-denied' || /permission/i.test(e.message || '')) {
-      msg = 'Permission denied reading Firestore. Publish the security rules from README.md (they allow "read: if request.auth != null"), and confirm the Firestore database exists.';
+      msg = 'Permission denied reading Firestore. Publish firestore.rules, confirm this account has an enabled admins/{uid} record, and confirm the database exists.';
     } else if (e.code === 'unavailable') {
       msg = 'Firestore is unreachable. Check your internet connection / that the database was created in this project.';
     } else if (e.code === 'failed-precondition') {

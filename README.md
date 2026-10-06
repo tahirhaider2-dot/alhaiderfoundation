@@ -7,7 +7,7 @@ This project is a responsive, bilingual demo website for Al Haider Foundation bu
 - styles.css — responsive styling and visual design
 - script.js — mobile navigation, gallery lightbox, donation copy buttons, and demo contact form handling
 - tracking.js — visitor analytics engine (Firebase): visitor ID, IP location, smart GPS, events
-- firebase-config.js — where you paste your Firebase keys (tracking stays OFF until you do)
+- firebase-config.js — public Firebase web config and App Check site key
 - admin.html — password-protected dashboard to view your visitors & analytics
 
 ## Visitor analytics (Firebase) — setup
@@ -23,49 +23,21 @@ Data is stored in **Firebase Firestore** and viewed in `admin.html`.
 ### 1. Create the Firebase project
 1. Go to <https://console.firebase.google.com> → **Add project**.
 2. Click the **`</>` (Web)** icon → **Register app** (nickname: `website`).
-3. Copy the shown `firebaseConfig` values into **`firebase-config.js`**.
+3. Copy the shown `firebaseConfig` values into **`firebase-config.js`**. These browser values are public identifiers, not secrets.
 4. Set `TRACKING_ENABLED = true` in that file.
 
 ### 2. Create the database
 - Left menu → **Build → Firestore Database → Create database** → *Production mode*.
 
-### 3. Paste these security rules
-In Firestore → **Rules** tab, replace everything with the rules below and
-**Publish**. Visitors can only *create* records (never read/edit others);
-only a signed-in admin can *read* them:
+### 3. Publish Firestore rules and allowlist admins
+In Firestore → **Rules**, publish the contents of **`firestore.rules`**. The
+rules restrict public access to validated analytics writes; reads and deletes
+require an explicit admin allowlist entry, not merely any signed-in account.
 
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    // Visitors' browsers may only CREATE small analytics docs.
-    // Only a signed-in admin can read/update/delete them.
-    match /visits/{id} {
-      allow create: if request.resource.data.size() < 60
-                    && request.resource.data.visitorId is string
-                    && request.resource.data.visitorId.size() < 100;
-      allow update: if request.auth != null
-                    || request.resource.data.diff(resource.data).affectedKeys()
-                         .hasOnly(['secondsOnPage']); // time-on-page update
-      allow read, delete: if request.auth != null;
-    }
-    match /events/{id} {
-      allow create: if request.resource.data.size() < 30
-                    && request.resource.data.event is string
-                    && request.resource.data.event.size() < 60;
-      allow read, update, delete: if request.auth != null;
-    }
-    match /visitors/{id} {
-      allow create, update: if request.resource.data.size() < 20;
-      allow read, delete: if request.auth != null;
-    }
-  }
-}
-```
-
-> These rules limit document size/shape so nobody can abuse the open
-> "create" permission to dump huge payloads. For strong anti-abuse
-> protection, also enable **App Check** (see the Security section below).
+After creating your admin login, copy its UID from Authentication → Users.
+In Firestore → **Data**, create `admins/{uid}` using that exact UID as the
+document ID and add the boolean field `enabled` with value `true`. Do this for
+each trusted dashboard user. Do not create admin entries for visitors.
 
 ### 4. Create your admin login
 - Left menu → **Build → Authentication → Get started** → enable
@@ -98,18 +70,25 @@ Each visit is flagged (`isVpn`) using free heuristics: datacenter/VPN ISP names
 (All / Exclude VPN / Only VPN). It catches most, but not 100%, of VPN traffic.
 
 ## Security checklist (important)
-1. **Publish the hardened Firestore rules above** (size/shape limited).
-2. **Restrict your API key**: Google Cloud Console → *APIs & Services →
-   Credentials* → your browser key → *Application restrictions* → **HTTP
-   referrers** → add your domain(s) (e.g. `yourdomain.com/*`). Stops others
-   reusing your key.
-3. **Enable App Check** (Firebase → *App Check* → register with reCAPTCHA v3)
-   so only *your* website can write to Firestore — the best anti-abuse control.
-4. **Keep sign-in methods minimal**: only **Email/Password** should be enabled
-   under Authentication, and only trusted admins added as Users. (Do NOT enable
-   Anonymous or open Google sign-in, or anyone could read your data.)
-5. **`admin.html` is protected** by Firebase Auth (reads require login) and all
-   visitor-supplied text is HTML-escaped to prevent stored XSS.
+1. **Restrict the browser API key** in Google Cloud Console → APIs & Services →
+  Credentials → its Application restrictions → **Websites**. Allow only your
+  production domain and any local development origins you actually use.
+  Restrict its API access to the Firebase APIs required by this site. The key
+  remains visible in browser code; restrictions limit where it can be used.
+2. **Enable App Check** in Firebase → App Check. Register the web app with
+  reCAPTCHA v3, copy its public site key into `firebaseAppCheckSiteKey` in
+  `firebase-config.js`, and add your site domain to the reCAPTCHA allowed
+  domains. Confirm both tracking and `admin.html` load correctly, then enable
+  enforcement for **Cloud Firestore** and **Authentication**. Do not enable
+  enforcement before configuring the site key.
+3. **Keep sign-in methods minimal**: enable only **Email/Password**, and add
+  only trusted administrators. An account must also have an enabled
+  `admins/{uid}` document to read analytics.
+4. **Do not commit service-account keys, private reCAPTCHA keys, or other
+  secrets.** A Firebase web API key and reCAPTCHA v3 site key are public by
+  design and must be protected with restrictions and Firebase security rules.
+5. **`admin.html` reads require an allowlisted account**; visitor-supplied text
+  is HTML-escaped before display.
 
 > ⚠️ Legal note: IP location, device fingerprint and visit data are **personal
 > data** in many regions. Add a short privacy notice (and a consent line for EU

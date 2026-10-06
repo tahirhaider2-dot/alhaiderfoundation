@@ -21,5 +21,8 @@ export const firebaseConfig = {
   measurementId: "G-CZ2X8516TR"
 };
 
+// Public reCAPTCHA v3 site key from Firebase App Check; never put a secret key here.
+export const firebaseAppCheckSiteKey = '';
+
 /* Tracking is now ON. */
 export const TRACKING_ENABLED = true;
