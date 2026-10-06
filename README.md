@@ -7,7 +7,7 @@ This project is a responsive, bilingual demo website for Al Haider Foundation bu
 - styles.css — responsive styling and visual design
 - script.js — mobile navigation, gallery lightbox, donation copy buttons, and demo contact form handling
 - tracking.js — visitor analytics engine (Firebase): visitor ID, IP location, smart GPS, events
-- firebase-config.js — public Firebase web config and App Check site key
+- firebase-config.js — local Firebase web config and App Check site key (gitignored)
 - admin.html — password-protected dashboard to view your visitors & analytics
 
 ## Visitor analytics (Firebase) — setup
