@@ -23,7 +23,7 @@ Data is stored in **Firebase Firestore** and viewed in `admin.html`.
 ### 1. Create the Firebase project
 1. Go to <https://console.firebase.google.com> → **Add project**.
 2. Click the **`</>` (Web)** icon → **Register app** (nickname: `website`).
-3. Copy the shown `firebaseConfig` values into **`firebase-config.js`**. These browser values are public identifiers, not secrets.
+3. Copy the shown `firebaseConfig` values into **`firebase-config.js`**. These browser values are public identifiers, not secrets. Keep this file included in your deployment; `admin.html` and `tracking.js` both import it.
 4. Set `TRACKING_ENABLED = true` in that file.
 
 ### 2. Create the database
