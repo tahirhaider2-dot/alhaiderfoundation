@@ -347,7 +347,7 @@ function authErrorHelp(code) {
     case 'auth/invalid-email':
       return 'That email address is not valid.';
     case 'auth/invalid-api-key':
-      return 'The Firebase API key in firebase-config.js is wrong.';
+      return 'The Firebase API key is invalid. Check the configured Firebase environment variables.';
     case 'auth/unauthorized-domain':
       return 'This domain is not authorized. Firebase Console → Authentication → Settings → Authorized domains → add alhaiderfoundation.com';
     case 'auth/network-request-failed':

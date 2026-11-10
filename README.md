@@ -7,7 +7,8 @@ This project is a responsive, bilingual demo website for Al Haider Foundation bu
 - styles.css — responsive styling and visual design
 - script.js — mobile navigation, gallery lightbox, donation copy buttons, and demo contact form handling
 - tracking.js — visitor analytics engine (Firebase): visitor ID, IP location, smart GPS, events
-- firebase-config.js — local Firebase web config and App Check site key (gitignored)
+- `.env.example` — placeholder names for Firebase browser configuration
+- `scripts/generate-firebase-config.mjs` — generates the ignored browser config at build time
 - admin.html — password-protected dashboard to view your visitors & analytics
 
 ## Visitor analytics (Firebase) — setup
@@ -17,14 +18,37 @@ only if they tap **Allow**), what device they use, where they came from, and
 which buttons they click (Download App, Donate, WhatsApp, Call, form submits).
 Data is stored in **Firebase Firestore** and viewed in `admin.html`.
 
-> Nothing is tracked until you finish these steps. Until then the site works
-> exactly as before and tracking is silently skipped.
+> Nothing is tracked until you configure Firebase and enable tracking.
+
+This is a static HTML site with browser ES modules, not a Vite/React/Next.js
+application. It has no framework-specific client env prefix. The generated
+`firebase-config.js` is a browser asset, so its Firebase web-app identifiers
+remain visible to visitors; do not put service-account credentials, private
+keys, or other server secrets in these variables.
 
 ### 1. Create the Firebase project
 1. Go to <https://console.firebase.google.com> → **Add project**.
 2. Click the **`</>` (Web)** icon → **Register app** (nickname: `website`).
-3. Copy the shown `firebaseConfig` values into **`firebase-config.js`**. These browser values are public identifiers, not secrets. Keep this file included in your deployment; `admin.html` and `tracking.js` both import it.
-4. Set `TRACKING_ENABLED = true` in that file.
+3. Copy `.env.example` to `.env.local` and fill in the Firebase web app values:
+   `FIREBASE_API_KEY`, `FIREBASE_AUTH_DOMAIN`, `FIREBASE_PROJECT_ID`,
+   `FIREBASE_STORAGE_BUCKET`, `FIREBASE_MESSAGING_SENDER_ID`,
+   `FIREBASE_APP_ID`, and, if used, `FIREBASE_MEASUREMENT_ID` and
+   `FIREBASE_APP_CHECK_SITE_KEY`. Set `FIREBASE_TRACKING_ENABLED=true` to turn
+   on analytics.
+4. Generate the browser module before previewing or deploying:
+
+   ```bash
+   node --env-file=.env.local scripts/generate-firebase-config.mjs
+   ```
+
+   Use Node.js 20.6 or newer. `firebase-config.js` is generated locally, ignored
+   by Git, and must be included in the published static site. Do not publish
+   before generating it.
+5. In your hosting provider's build environment, define the same `FIREBASE_*`
+   variables and run `node scripts/generate-firebase-config.mjs` as the build
+   command before publishing the site. If using GitHub Actions, define these
+   as repository/environment variables and generate the module in the
+   deployment workflow. These values are public browser config, not secrets.
 
 ### 2. Create the database
 - Left menu → **Build → Firestore Database → Create database** → *Production mode*.
@@ -76,9 +100,9 @@ Each visit is flagged (`isVpn`) using free heuristics: datacenter/VPN ISP names
   Restrict its API access to the Firebase APIs required by this site. The key
   remains visible in browser code; restrictions limit where it can be used.
 2. **Enable App Check** in Firebase → App Check. Register the web app with
-  reCAPTCHA v3, copy its public site key into `firebaseAppCheckSiteKey` in
-  `firebase-config.js`, and add your site domain to the reCAPTCHA allowed
-  domains. Confirm both tracking and `admin.html` load correctly, then enable
+  reCAPTCHA v3, set its public site key as `FIREBASE_APP_CHECK_SITE_KEY` in the
+  environment and add your site domain to the reCAPTCHA allowed domains.
+  Confirm both tracking and `admin.html` load correctly, then enable
   enforcement for **Cloud Firestore** and **Authentication**. Do not enable
   enforcement before configuring the site key.
 3. **Keep sign-in methods minimal**: enable only **Email/Password**, and add

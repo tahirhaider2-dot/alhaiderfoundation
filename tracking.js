@@ -30,7 +30,7 @@ import {
 
 /* ── Bail out early if Firebase isn't configured yet ── */
 if (!TRACKING_ENABLED) {
-  console.info('[tracking] disabled — set TRACKING_ENABLED = true in firebase-config.js after adding your keys.');
+  console.info('[tracking] disabled — set FIREBASE_TRACKING_ENABLED=true in your environment to enable it.');
 }
 
 let db = null;
